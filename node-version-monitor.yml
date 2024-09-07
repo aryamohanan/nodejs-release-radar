@@ -1,0 +1,66 @@
+name: Node.js Release Radar
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Runs every 6 hours
+  workflow_dispatch:  
+
+jobs:
+  check-node-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Fetch the latest Node.js version from the official API
+      - name: Get the latest Node.js version
+        id: get_node_version
+        run: |
+          curl -s https://nodejs.org/dist/index.json | jq '.[0].version' > latest_node_version.txt
+          NEW_VERSION=$(cat latest_node_version.txt)
+          echo "Node.js Latest Version: $NEW_VERSION"
+          echo "::set-output name=node_version::$NEW_VERSION"
+
+      # Step 2: Restore the previously saved Node.js version from cache
+      - name: Restore previous version from cache
+        id: restore_cache
+        uses: actions/cache@v3
+        with:
+          path: previous_node_version.txt
+          key: node-version-cache
+
+      # Step 3: Compare the fetched version with the previous version
+      - name: Compare versions
+        id: compare_versions
+        run: |
+          if [ -f previous_node_version.txt ]; then
+            PREVIOUS_VERSION=$(cat previous_node_version.txt)
+          else
+            PREVIOUS_VERSION="none"
+          fi
+          NEW_VERSION=${{ steps.get_node_version.outputs.node_version }}
+          echo "Previous Node.js version: $PREVIOUS_VERSION"
+          echo "Latest Node.js version: $NEW_VERSION"
+          if [ "$NEW_VERSION" != "$PREVIOUS_VERSION" ]; then
+            echo "::set-output name=notify::true"
+          else
+            echo "::set-output name=notify::false"
+          fi
+
+      # Step 4: Notify Slack if a new version is detected
+      - name: Notify Slack if a new version is detected
+        if: steps.compare_versions.outputs.notify == 'true'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":"New Node.js version detected: '"${{ steps.get_node_version.outputs.node_version }}"'"}' \
+          $SLACK_WEBHOOK_URL
+
+      # Step 5: Save the new version to cache for future comparisons
+      - name: Save new version to cache
+        if: steps.compare_versions.outputs.notify == 'true'
+        run: |
+          echo "${{ steps.get_node_version.outputs.node_version }}" > previous_node_version.txt
+        uses: actions/cache@v3
+        with:
+          path: previous_node_version.txt
+          key: node-version-cache
