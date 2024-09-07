@@ -55,7 +55,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           curl -X POST -H 'Content-type: application/json' \
-          --data '{"text":"New Node.js version detected: '"${{ steps.get_node_version.outputs.node_version }}"'"}' \
+          --data '{"text":"🚀 New Node.js version released: '"${{ steps.get_node_version.outputs.node_version }}"'🎊🥳"}' \
           $SLACK_WEBHOOK_URL
 
       # Step 5: Save the new version to cache for future comparisons
