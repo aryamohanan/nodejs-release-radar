@@ -55,12 +55,14 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           curl -X POST -H 'Content-type: application/json' \
-          --data '{"text":"🚀 New Node.js version released: '"${{ steps.get_node_version.outputs.node_version }}"'🎊🥳"}' \
+          --data '{"text":"🚀 New Node.js version released: '"${{ steps.get_node_version.outputs.node_version }}"' 🎊🥳"}' \
           $SLACK_WEBHOOK_URL
 
       # Step 5: Save the new version to cache for future comparisons
       - name: Save new version to cache
         if: steps.compare_versions.outputs.notify == 'true'
+        run: |
+          echo "${{ steps.get_node_version.outputs.node_version }}" > previous_node_version.txt
         uses: actions/cache@v3
         with:
           path: previous_node_version.txt
