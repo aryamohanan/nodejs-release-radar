@@ -3,7 +3,7 @@ name: Node.js Release Radar
 on:
   schedule:
     - cron: '0 */6 * * *'  # Runs every 6 hours
-  workflow_dispatch:  
+  workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
   check-node-version:
@@ -18,6 +18,7 @@ jobs:
           NEW_VERSION=$(cat latest_node_version.txt)
           echo "Node.js Latest Version: $NEW_VERSION"
           echo "::set-output name=node_version::$NEW_VERSION"
+
       # Step 2: Restore the previously saved Node.js version from cache
       - name: Restore previous version from cache
         id: restore_cache
@@ -43,8 +44,9 @@ jobs:
           else
             echo "::set-output name=notify::false"
           fi
-      # Step 4: Notify Slack if a new version is detected
-      - name: Notify Slack if a new version is detected
+
+      # Step 4: Notify Slack user if a new version is detected
+      - name: Notify Slack user if a new version is detected
         if: steps.compare_versions.outputs.notify == 'true'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
