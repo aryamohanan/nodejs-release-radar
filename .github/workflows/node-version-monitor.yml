@@ -25,7 +25,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: previous_node_version.txt
-          key: node-version-cache
+          key: node-version-cache-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            node-version-cache-${{ runner.os }}-
+            node-version-cache-
 
       # Step 3: Compare the fetched version with the previous version
       - name: Compare versions
@@ -61,4 +64,4 @@ jobs:
         uses: actions/cache@v3
         with:
           path: previous_node_version.txt
-          key: node-version-cache
+          key: node-version-cache-${{ runner.os }}-${{ github.sha }}
