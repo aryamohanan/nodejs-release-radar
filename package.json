@@ -1,0 +1,19 @@
+{
+  "name": "nodejs-release-radar",
+  "version": "1.0.0",
+  "description": "Node.js Release Radar is a monitoring tool designed to keep you informed about the latest major releases of Node.js. This automated solution periodically checks for new Node.js versions and sends timely notifications to your Slack channel whenever a new major version is released.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aryamohanan/nodejs-release-radar.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aryamohanan/nodejs-release-radar/issues"
+  },
+  "homepage": "https://github.com/aryamohanan/nodejs-release-radar#readme"
+}
