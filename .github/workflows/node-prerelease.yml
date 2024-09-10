@@ -1,0 +1,28 @@
+name: scheduled-check-releases
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Every Sunday at midnight UTC
+  workflow_dispatch:
+
+jobs:
+  check-releases:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # or the version you need
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run release check script
+        env:
+          slacktoken: ${{ secrets.slacktoken }}
+        run: node index.js
+
